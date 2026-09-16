@@ -31,7 +31,7 @@ Uni-Connect is a full-stack web application that provides Nigerian university st
 
 The platform was developed as a final-year capstone project at the **Department of Computer Science, University of Nigeria, Nsukka**, in partial fulfilment of the requirements for the award of a Bachelor of Science (B.Sc.) degree in Computer Science.
 
-> **Supervisor:** Prof. C.N. Udanor, Department of Computer Science, UNN
+> **Supervisor:** Prof. N. E. Ogbene, Department of Computer Science, UNN
 
 ---
 
