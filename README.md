@@ -390,10 +390,10 @@ This project was submitted in partial fulfilment of the requirements for the awa
 **Bachelor of Science (B.Sc.) in Computer Science**  
 Department of Computer Science  
 University of Nigeria, Nsukka  
-November 2025
+September 2026
 
-**Author:** *(Igwesi Chiemerie Divine)*  
-**Registration Number:** *(2021/243283)*  
+**Author:** *(Nwokedi Nnamdi Prince)*  
+**Registration Number:** *(2022/244034)*  
 
 
 ---
@@ -406,7 +406,7 @@ This project is released under the [MIT License](LICENSE). You are free to use, 
 
 ## Acknowledgements
 
-- Prof. C.N. Udanor — project supervision and guidance
+- Prof. N. E. Ogbene — project supervision and guidance
 - The Department of Computer Science, UNN — academic foundation
 - All students and lecturers whose feedback shaped the platform's design
 - The Django, Bootstrap, and Spline open-source communities
