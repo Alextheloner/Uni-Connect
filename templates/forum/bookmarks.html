@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+{% block title %}My Bookmarks — Uni-Connect{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div class="container">
+    <h1 class="h2 fw-bold text-white mb-1"><i class="bi bi-bookmark-fill me-2"></i>My Bookmarks</h1>
+    <p class="text-muted mb-0">Threads you've saved for later</p>
+  </div>
+</div>
+<div class="container pb-5">
+  {% for bookmark in bookmarks %}
+  <a href="{% url 'forum:thread_detail' bookmark.thread.pk %}" class="thread-card mb-3">
+    <div class="d-flex align-items-start gap-3">
+      <div class="avatar-sm mt-1">{{ bookmark.thread.author.username|first|upper }}</div>
+      <div class="flex-grow-1">
+        <div class="d-flex gap-2 mb-1">
+          <span class="badge badge-glass small">{{ bookmark.thread.course.code }}</span>
+          <span class="badge {% if bookmark.thread.status == 'resolved' %}badge-resolved{% else %}badge-open{% endif %}">{{ bookmark.thread.status }}</span>
+        </div>
+        <div class="thread-title">{{ bookmark.thread.title }}</div>
+        <div class="thread-excerpt mt-1">{{ bookmark.thread.content|truncatechars:100 }}</div>
+        <div class="text-muted small mt-2">
+          <i class="bi bi-bookmark me-1"></i>Bookmarked {{ bookmark.created_at|timesince }} ago
+        </div>
+      </div>
+    </div>
+  </a>
+  {% empty %}
+  <div class="glass-panel p-5 text-center">
+    <i class="bi bi-bookmark fs-1 text-muted d-block mb-3"></i>
+    <p class="text-muted mb-3">No bookmarks yet.</p>
+    <a href="{% url 'forum:thread_list' %}" class="btn btn-primary-glow">Browse Threads</a>
+  </div>
+  {% endfor %}
+</div>
+{% endblock %}

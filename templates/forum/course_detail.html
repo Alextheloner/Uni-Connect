@@ -1,0 +1,95 @@
+{% extends 'base.html' %}
+{% block title %}{{ course.code }} — {{ course.title }} — Uni-Connect{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div class="container">
+    <nav aria-label="breadcrumb" class="mb-3">
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{% url 'forum:departments' %}" class="text-accent text-decoration-none">Departments</a></li>
+        <li class="breadcrumb-item"><a href="{% url 'forum:department_detail' course.department.pk %}" class="text-accent text-decoration-none">{{ course.department.name }}</a></li>
+        <li class="breadcrumb-item active text-muted">{{ course.code }}</li>
+      </ol>
+    </nav>
+    <div class="d-flex align-items-start justify-content-between flex-wrap gap-3">
+      <div>
+        <div class="d-flex align-items-center gap-3 mb-2">
+          <span class="badge badge-glow">{{ course.code }}</span>
+          <span class="text-muted small">{{ course.level }} · {{ course.semester }} · {{ course.units }} units</span>
+        </div>
+        <h1 class="display-6 fw-bold text-white mb-0">{{ course.title }}</h1>
+        {% if course.description %}<p class="text-muted mt-2 mb-0">{{ course.description }}</p>{% endif %}
+      </div>
+      <a href="{% url 'forum:create_thread_course' course.pk %}" class="btn btn-primary-glow">
+        <i class="bi bi-plus-lg me-1"></i>Ask in {{ course.code }}
+      </a>
+    </div>
+  </div>
+</div>
+
+<div class="container pb-5">
+  <!-- Filters -->
+  <div class="d-flex align-items-center gap-3 mb-4 flex-wrap">
+    <div class="d-flex gap-2">
+      <a href="?sort=latest" class="btn btn-sm {% if sort == 'latest' %}btn-primary-glow{% else %}btn-outline-glass{% endif %}">Latest</a>
+      <a href="?sort=popular" class="btn btn-sm {% if sort == 'popular' %}btn-primary-glow{% else %}btn-outline-glass{% endif %}">Popular</a>
+      <a href="?sort=unanswered" class="btn btn-sm {% if sort == 'unanswered' %}btn-primary-glow{% else %}btn-outline-glass{% endif %}">Unanswered</a>
+    </div>
+    <div class="d-flex gap-2 ms-auto">
+      <a href="?status=" class="btn btn-sm {% if not status_filter %}btn-primary-glow{% else %}btn-outline-glass{% endif %}">All</a>
+      <a href="?status=open" class="btn btn-sm {% if status_filter == 'open' %}btn-primary-glow{% else %}btn-outline-glass{% endif %}">Open</a>
+      <a href="?status=resolved" class="btn btn-sm {% if status_filter == 'resolved' %}btn-primary-glow{% else %}btn-outline-glass{% endif %}">Resolved</a>
+    </div>
+  </div>
+
+  <!-- Thread count -->
+  <p class="text-muted small mb-3">{{ page_obj.paginator.count }} thread{{ page_obj.paginator.count|pluralize }}</p>
+
+  <!-- Threads -->
+  {% for thread in page_obj %}
+  <a href="{% url 'forum:thread_detail' thread.pk %}" class="thread-card mb-3">
+    <div class="d-flex align-items-start gap-3">
+      <div class="avatar-sm mt-1">{{ thread.author.username|first|upper }}</div>
+      <div class="flex-grow-1 min-w-0">
+        <div class="d-flex align-items-center gap-2 mb-1 flex-wrap">
+          <span class="badge {% if thread.status == 'resolved' %}badge-resolved{% else %}badge-open{% endif %}">{{ thread.status }}</span>
+          {% if thread.is_pinned %}<span class="badge badge-glow"><i class="bi bi-pin-fill me-1"></i>Pinned</span>{% endif %}
+          {% if thread.has_verified_answer %}<span class="badge" style="background:rgba(16,185,129,0.1);color:#6ee7b7;border:1px solid rgba(16,185,129,0.2);"><i class="bi bi-patch-check me-1"></i>Answered</span>{% endif %}
+        </div>
+        <div class="thread-title">{{ thread.title }}</div>
+        <div class="thread-excerpt mt-1">{{ thread.content|truncatechars:120 }}</div>
+        <div class="d-flex gap-4 text-muted small mt-2">
+          <span>{{ thread.author.username }}</span>
+          <span><i class="bi bi-chat me-1"></i>{{ thread.reply_count }}</span>
+          <span><i class="bi bi-eye me-1"></i>{{ thread.views }}</span>
+          <span class="ms-auto"><i class="bi bi-clock me-1"></i>{{ thread.created_at|timesince }} ago</span>
+        </div>
+      </div>
+    </div>
+  </a>
+  {% empty %}
+  <div class="glass-panel p-5 text-center">
+    <i class="bi bi-chat-square-dots fs-1 text-muted d-block mb-3"></i>
+    <p class="text-muted mb-3">No threads yet in {{ course.code }}.</p>
+    <a href="{% url 'forum:create_thread_course' course.pk %}" class="btn btn-primary-glow">Be the first to ask</a>
+  </div>
+  {% endfor %}
+
+  <!-- Pagination -->
+  {% if page_obj.has_other_pages %}
+  <nav class="mt-4">
+    <ul class="pagination justify-content-center gap-2">
+      {% if page_obj.has_previous %}<li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}&sort={{ sort }}&status={{ status_filter }}">Previous</a></li>{% endif %}
+      {% for num in page_obj.paginator.page_range %}
+        {% if page_obj.number == num %}
+          <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+        {% elif num|add:"-3" < page_obj.number and num|add:"3" > page_obj.number %}
+          <li class="page-item"><a class="page-link" href="?page={{ num }}&sort={{ sort }}&status={{ status_filter }}">{{ num }}</a></li>
+        {% endif %}
+      {% endfor %}
+      {% if page_obj.has_next %}<li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}&sort={{ sort }}&status={{ status_filter }}">Next</a></li>{% endif %}
+    </ul>
+  </nav>
+  {% endif %}
+</div>
+{% endblock %}

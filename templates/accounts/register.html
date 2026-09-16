@@ -1,0 +1,151 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Join Uni-Connect{% endblock %}
+{% block body_class %}auth-page{% endblock %}
+
+{% block content %}
+<div class="position-relative" style="min-height:100vh;">
+  <div class="auth-spline">
+    <script type="module" src="https://unpkg.com/@splinetool/viewer@1.9.82/build/spline-viewer.js"></script>
+    <spline-viewer url="https://prod.spline.design/8b9b5100-4168-4401-8f66-2d5ab24026fb/scene.splinecode" loading-anim="false" style="width:100%;height:100%;"></spline-viewer>
+  </div>
+  <div class="auth-overlay"></div>
+
+  <div class="container d-flex align-items-center justify-content-center py-5" style="min-height:100vh;position:relative;z-index:2;">
+    <div class="auth-form-wrap py-4 w-100" style="max-width:520px;">
+      <div class="glass-panel p-5">
+        <div class="text-center mb-4">
+          <div class="brand-icon mx-auto mb-3" style="width:56px;height:56px;font-size:1.5rem;border-radius:16px;">
+            <i class="bi bi-mortarboard-fill"></i>
+          </div>
+          <h1 class="h3 fw-700 text-white mb-1">Join Uni-Connect</h1>
+          <p class="text-muted small">Create your Uni-Connect academic account</p>
+        </div>
+
+        <form method="post">
+          {% csrf_token %}
+          <div class="row g-3">
+            <div class="col-6">
+              <label class="form-label">First Name</label>
+              {{ form.first_name }}
+              {% if form.first_name.errors %}<div class="text-danger small mt-1">{{ form.first_name.errors|join:", " }}</div>{% endif %}
+            </div>
+            <div class="col-6">
+              <label class="form-label">Last Name</label>
+              {{ form.last_name }}
+              {% if form.last_name.errors %}<div class="text-danger small mt-1">{{ form.last_name.errors|join:", " }}</div>{% endif %}
+            </div>
+            <div class="col-12">
+              <label class="form-label">Username</label>
+              {{ form.username }}
+              {% if form.username.errors %}<div class="text-danger small mt-1">{{ form.username.errors|join:", " }}</div>{% endif %}
+            </div>
+            <div class="col-12">
+              <label class="form-label">Email Address</label>
+              {{ form.email }}
+              {% if form.email.errors %}<div class="text-danger small mt-1">{{ form.email.errors|join:", " }}</div>{% endif %}
+            </div>
+            <div class="col-6">
+              <label class="form-label">Role</label>
+              {{ form.role }}
+              {% if form.role.errors %}<div class="text-danger small mt-1">{{ form.role.errors|join:", " }}</div>{% endif %}
+            </div>
+            <div class="col-12">
+              <label class="form-label">School / Institution</label>
+              {{ form.school }}
+              {% if form.school.errors %}<div class="text-danger small mt-1">{{ form.school.errors|join:", " }}</div>{% endif %}
+            </div>
+            <div class="col-12">
+              <label class="form-label">Department</label>
+              {{ form.department }}
+              <div class="form-text text-muted small mt-1" id="dept-help">Select your school first to see its departments.</div>
+              {% if form.department.errors %}<div class="text-danger small mt-1">{{ form.department.errors|join:", " }}</div>{% endif %}
+            </div>
+            <div class="col-12">
+              <label class="form-label">Matric Number <span class="text-muted">(optional)</span></label>
+              {{ form.matric_number }}
+            </div>
+            <div class="col-12">
+              <label class="form-label">Password</label>
+              {{ form.password1 }}
+              {% if form.password1.errors %}<div class="text-danger small mt-1">{{ form.password1.errors|join:", " }}</div>{% endif %}
+            </div>
+            <div class="col-12">
+              <label class="form-label">Confirm Password</label>
+              {{ form.password2 }}
+              {% if form.password2.errors %}<div class="text-danger small mt-1">{{ form.password2.errors|join:", " }}</div>{% endif %}
+            </div>
+          </div>
+          {% if form.non_field_errors %}
+            <div class="alert alert-danger glass-panel border-danger small py-2 mt-3">{{ form.non_field_errors|join:", " }}</div>
+          {% endif %}
+          <button type="submit" class="btn btn-primary-glow w-100 py-3 mt-4">
+            <i class="bi bi-person-check me-2"></i>Create Account
+          </button>
+        </form>
+
+        <p class="text-center text-muted small mt-4 mb-0">
+          Already have an account? <a href="{% url 'accounts:login' %}" class="text-accent text-decoration-none fw-600">Sign in</a>
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>gsap.from(".glass-panel", { opacity: 0, y: 40, duration: 0.8, ease: "power3.out" });</script>
+<script>
+(function () {
+  const schoolSelect = document.getElementById('id_school');
+  const deptSelect = document.getElementById('id_department');
+  const deptHelp = document.getElementById('dept-help');
+  if (!schoolSelect || !deptSelect) return;
+
+  const initialDept = deptSelect.value;
+
+  function loadDepartments(schoolId, selectedId) {
+    deptSelect.innerHTML = '';
+    if (!schoolId) {
+      const opt = document.createElement('option');
+      opt.value = '';
+      opt.textContent = 'Select your school first...';
+      deptSelect.appendChild(opt);
+      if (deptHelp) deptHelp.textContent = 'Select your school first to see its departments.';
+      return;
+    }
+    if (deptHelp) deptHelp.textContent = 'Loading departments...';
+    fetch(`{% url 'accounts:ajax_load_departments' %}?school=${encodeURIComponent(schoolId)}`, {
+      headers: { 'X-Requested-With': 'XMLHttpRequest' },
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        deptSelect.innerHTML = '';
+        const placeholder = document.createElement('option');
+        placeholder.value = '';
+        placeholder.textContent = data.departments.length ? 'Select department...' : 'No departments for this school yet';
+        deptSelect.appendChild(placeholder);
+        data.departments.forEach((dept) => {
+          const opt = document.createElement('option');
+          opt.value = dept.id;
+          opt.textContent = dept.name;
+          if (String(dept.id) === String(selectedId)) opt.selected = true;
+          deptSelect.appendChild(opt);
+        });
+        if (deptHelp) deptHelp.textContent = `${data.departments.length} department(s) available.`;
+      })
+      .catch(() => {
+        if (deptHelp) deptHelp.textContent = 'Could not load departments. Please try again.';
+      });
+  }
+
+  schoolSelect.addEventListener('change', () => loadDepartments(schoolSelect.value, null));
+
+  // On validation-error re-render, pre-populate departments for the school
+  // the user had already chosen.
+  if (schoolSelect.value) {
+    loadDepartments(schoolSelect.value, initialDept);
+  }
+})();
+</script>
+{% endblock %}

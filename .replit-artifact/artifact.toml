@@ -1,0 +1,23 @@
+kind = "web"
+previewPath = "/"
+title = "Uni-Connect"
+version = "1.0.0"
+id = "artifacts/uni-connect"
+router = "path"
+
+[[integratedSkills]]
+name = "react-vite"
+version = "1.0.0"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 19577
+
+[services.development]
+run = "python3 /home/runner/workspace/artifacts/uni-connect/manage.py runserver 0.0.0.0:19577"
+
+[services.env]
+PORT = "19577"
+DJANGO_SETTINGS_MODULE = "uniconnect.settings"
+PYTHONPATH = "/home/runner/workspace/artifacts/uni-connect"

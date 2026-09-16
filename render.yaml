@@ -1,0 +1,21 @@
+services:
+  - type: web
+    name: uni-connect
+    runtime: python
+    buildCommand: "./build.sh"
+    startCommand: "gunicorn uniconnect.wsgi:application"
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: uni-connect-db
+          property: connectionString
+      - key: SECRET_KEY
+        generateValue: true
+      - key: DEBUG
+        value: false
+      - key: PYTHON_VERSION
+        value: 3.11.0
+
+databases:
+  - name: uni-connect-db
+    plan: free

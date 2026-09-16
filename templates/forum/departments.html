@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+{% block title %}Departments — Uni-Connect{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div class="container">
+    <span class="badge badge-glass mb-2">
+      {% if user.is_authenticated and user.school %}{{ user.school.name }}{% else %}Nationwide{% endif %}
+    </span>
+    <h1 class="display-5 fw-bold text-white mb-1">All Departments</h1>
+    <p class="text-muted">Explore academic discussions organized by department and course</p>
+  </div>
+</div>
+
+<div class="container pb-6">
+  <div class="row g-4">
+    {% for dept in departments %}
+    <div class="col-md-4 col-lg-3 dept-card-wrap">
+      <a href="{% url 'forum:department_detail' dept.pk %}" class="dept-card glass-panel text-decoration-none d-block p-4">
+        <div class="dept-icon mb-3" style="color:{{ dept.color }};">
+          <i class="bi {{ dept.icon }} fs-1"></i>
+        </div>
+        <h5 class="text-white fw-600 mb-1">{{ dept.name }}</h5>
+        {% if dept.school %}<p class="text-muted small mb-0"><i class="bi bi-bank me-1"></i>{{ dept.school.short_name|default:dept.school.name }}</p>{% endif %}
+        <p class="text-muted small mb-0">{{ dept.faculty }}</p>
+        {% if dept.description %}
+        <p class="text-muted small mt-2">{{ dept.description|truncatechars:80 }}</p>
+        {% endif %}
+        <div class="d-flex gap-3 mt-3 pt-3" style="border-top:1px solid rgba(255,255,255,0.06);">
+          <span class="text-muted small"><i class="bi bi-book me-1"></i>{{ dept.num_courses }} courses</span>
+          <span class="text-muted small"><i class="bi bi-chat me-1"></i>{{ dept.num_threads }} threads</span>
+        </div>
+      </a>
+    </div>
+    {% empty %}
+    <div class="col-12">
+      <div class="glass-panel p-5 text-center">
+        <i class="bi bi-grid fs-1 text-muted d-block mb-3"></i>
+        <p class="text-muted">No departments yet.</p>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+gsap.registerPlugin(ScrollTrigger);
+gsap.from(".dept-card-wrap", {
+  opacity: 0, y: 30, duration: 0.6, stagger: 0.07, ease: "power2.out",
+  scrollTrigger: { trigger: ".row", start: "top 80%" }
+});
+</script>
+{% endblock %}

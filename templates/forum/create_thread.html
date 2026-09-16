@@ -1,0 +1,155 @@
+{% extends 'base.html' %} 
+{% block title %}Ask a Question — Uni-Connect{% endblock %} 
+{% block content %}
+<div class="page-header">
+  <div class="container">
+    <h1 class="h2 fw-bold text-white mb-1">
+      <i class="bi bi-pencil-square me-2"></i>Ask a Question
+    </h1>
+    <p class="text-muted mb-0">
+      Be specific. Include what you've tried and which course/topic this is
+      about.
+    </p>
+  </div>
+</div>
+
+<div class="container pb-5">
+  <div class="row g-4">
+    <div class="col-lg-8">
+      <div class="glass-panel p-5">
+        <form method="post" enctype="multipart/form-data">
+          {% csrf_token %}
+          <div class="mb-4">
+            <label class="form-label fw-500"
+              >Course <span class="text-danger">*</span></label
+            >
+            {{ form.course }} {% if form.course.errors %}
+            <div class="text-danger small mt-1">
+              {{ form.course.errors|join:", " }}
+            </div>
+            {% endif %}
+          </div>
+          <div class="mb-4">
+            <label class="form-label fw-500"
+              >Question Title <span class="text-danger">*</span></label
+            >
+            {{ form.title }}
+            <div class="form-text text-muted small mt-1">
+              Write a clear, specific title that summarizes your question
+            </div>
+            {% if form.title.errors %}
+            <div class="text-danger small mt-1">
+              {{ form.title.errors|join:", " }}
+            </div>
+            {% endif %}
+          </div>
+          <div class="mb-4">
+            <label class="form-label fw-500"
+              >Details <span class="text-danger">*</span></label
+            >
+            <div class="d-flex flex-wrap gap-2 mb-2">
+              <button
+                type="button"
+                class="btn btn-outline-glass btn-sm emoji-button"
+                data-target="id_content"
+              >
+                😀 Insert emoji
+              </button>
+              <button
+                type="button"
+                class="btn btn-outline-glass btn-sm record-voice-button"
+                data-target="id_voice_note"
+              >
+                🎙 Record voice note
+              </button>
+              <span class="text-muted small"
+                >Use emojis, attach files, or add a voice note.</span
+              >
+            </div>
+            {{ form.content }}
+            <div class="form-text text-muted small mt-1">
+              Include context, what you've already tried, and the exact error or
+              concept you're stuck on
+            </div>
+            {% if form.content.errors %}
+            <div class="text-danger small mt-1">
+              {{ form.content.errors|join:", " }}
+            </div>
+            {% endif %}
+          </div>
+          <div class="mb-4">
+            <label class="form-label fw-500">Attach a file</label>
+            {{ form.attachment }}
+            <div class="form-text text-muted small mt-1">
+              Add a screenshot, log file, or supporting document.
+            </div>
+          </div>
+          <div class="mb-4">
+            <label class="form-label fw-500">Voice note</label>
+            {{ form.voice_note }}
+            <div class="form-text text-muted small mt-1">
+              Record or upload a short voice explanation for your question.
+            </div>
+          </div>
+          {% if form.tags.field.queryset.exists %}
+          <div class="mb-4">
+            <label class="form-label fw-500">Tags</label>
+            <div class="d-flex flex-wrap gap-2">{{ form.tags }}</div>
+          </div>
+          {% endif %}
+          <div class="d-flex gap-3 mt-4">
+            <button type="submit" class="btn btn-primary-glow px-5">
+              <i class="bi bi-send me-2"></i>Post Question
+            </button>
+            <a
+              href="{% url 'forum:thread_list' %}"
+              class="btn btn-outline-glass px-4"
+              >Cancel</a
+            >
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <div class="col-lg-4">
+      <div class="glass-panel p-4">
+        <h6 class="text-white fw-600 mb-3">
+          <i class="bi bi-lightbulb me-2"></i>Tips for a great question
+        </h6>
+        <ul
+          class="list-unstyled"
+          style="
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 0.875rem;
+            line-height: 1.8;
+          "
+        >
+          <li class="mb-2">
+            <i class="bi bi-check text-accent me-2"></i>Search for similar
+            questions first
+          </li>
+          <li class="mb-2">
+            <i class="bi bi-check text-accent me-2"></i>Choose the right course
+          </li>
+          <li class="mb-2">
+            <i class="bi bi-check text-accent me-2"></i>Be specific about the
+            concept or problem
+          </li>
+          <li class="mb-2">
+            <i class="bi bi-check text-accent me-2"></i>Include what you've
+            already tried
+          </li>
+          <li class="mb-2">
+            <i class="bi bi-check text-accent me-2"></i>Add relevant tags to
+            help others find it
+          </li>
+          <li>
+            <i class="bi bi-check text-accent me-2"></i>Keep it academic and
+            respectful
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

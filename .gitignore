@@ -1,0 +1,9 @@
+.env
+__pycache__/
+*.pyc
+myenv/
+venv/
+sent_emails/*
+!sent_emails/.gitkeep
+media/uploads/*
+.DS_Store

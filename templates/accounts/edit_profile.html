@@ -1,0 +1,74 @@
+{% extends 'base.html' %}
+{% block title %}Edit Profile — Uni-Connect{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div class="container">
+    <h1 class="h2 fw-bold text-white mb-1"><i class="bi bi-pencil-square me-2"></i>Edit Profile</h1>
+    <p class="text-muted mb-0">Update your personal information</p>
+  </div>
+</div>
+<div class="container pb-5" style="max-width:600px;">
+  <div class="glass-panel p-5">
+    <form method="post" enctype="multipart/form-data">
+      {% csrf_token %}
+      {% for field in form %}
+      <div class="mb-4">
+        <label class="form-label">{{ field.label }}</label>
+        {{ field }}
+        {% if field.help_text %}<div class="form-text text-muted small">{{ field.help_text }}</div>{% endif %}
+        {% if field.errors %}<div class="text-danger small mt-1">{{ field.errors|join:", " }}</div>{% endif %}
+      </div>
+      {% endfor %}
+      <div class="d-flex gap-3">
+        <button type="submit" class="btn btn-primary-glow px-4">Save Changes</button>
+        <a href="{% url 'accounts:profile' %}" class="btn btn-outline-glass px-4">Cancel</a>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+(function () {
+  const schoolSelect = document.getElementById('id_school');
+  const deptSelect = document.getElementById('id_department');
+  if (!schoolSelect || !deptSelect) return;
+
+  const initialDept = deptSelect.value;
+
+  function loadDepartments(schoolId, selectedId) {
+    if (!schoolId) {
+      deptSelect.innerHTML = '<option value="">Select your school first...</option>';
+      return;
+    }
+    fetch(`{% url 'accounts:ajax_load_departments' %}?school=${encodeURIComponent(schoolId)}`, {
+      headers: { 'X-Requested-With': 'XMLHttpRequest' },
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        deptSelect.innerHTML = '';
+        const placeholder = document.createElement('option');
+        placeholder.value = '';
+        placeholder.textContent = data.departments.length ? 'Select department...' : 'No departments for this school yet';
+        deptSelect.appendChild(placeholder);
+        data.departments.forEach((dept) => {
+          const opt = document.createElement('option');
+          opt.value = dept.id;
+          opt.textContent = dept.name;
+          if (String(dept.id) === String(selectedId)) opt.selected = true;
+          deptSelect.appendChild(opt);
+        });
+      });
+  }
+
+  schoolSelect.addEventListener('change', () => loadDepartments(schoolSelect.value, null));
+
+  // Preserve the user's current department when the page first loads.
+  if (schoolSelect.value) {
+    loadDepartments(schoolSelect.value, initialDept);
+  }
+})();
+</script>
+{% endblock %}

@@ -1,0 +1,86 @@
+{% extends 'base.html' %}
+{% block title %}{{ department.name }} — Uni-Connect{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div class="container">
+    <nav aria-label="breadcrumb" class="mb-3">
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{% url 'forum:departments' %}" class="text-accent text-decoration-none">Departments</a></li>
+        <li class="breadcrumb-item active text-muted">{{ department.name }}</li>
+      </ol>
+    </nav>
+    <div class="d-flex align-items-center gap-4">
+      <div style="color:{{ department.color }}; font-size:3rem;">
+        <i class="bi {{ department.icon }}"></i>
+      </div>
+      <div>
+        <h1 class="display-6 fw-bold text-white mb-1">{{ department.name }}</h1>
+        <p class="text-muted mb-0">{{ department.faculty }}</p>
+        {% if department.description %}<p class="text-muted small mt-1 mb-0">{{ department.description }}</p>{% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="container pb-5">
+  <div class="row g-4">
+    <!-- Courses -->
+    <div class="col-lg-5">
+      <h5 class="text-white fw-600 mb-4"><i class="bi bi-book me-2"></i>Courses <span class="badge badge-glass ms-2">{{ courses.count }}</span></h5>
+      <div class="d-flex flex-column gap-3">
+        {% for course in courses %}
+        <a href="{% url 'forum:course_detail' course.pk %}" class="glass-panel p-3 text-decoration-none d-block" style="border-radius:14px;">
+          <div class="d-flex align-items-center gap-3">
+            <div>
+              <div class="d-flex align-items-center gap-2 mb-1">
+                <span class="badge badge-glow small">{{ course.code }}</span>
+                <span class="text-muted small">{{ course.level }} · {{ course.semester }}</span>
+              </div>
+              <div class="text-white fw-500 small">{{ course.title }}</div>
+            </div>
+            <div class="ms-auto text-end">
+              <div class="text-muted small"><i class="bi bi-chat me-1"></i>{{ course.thread_count }}</div>
+              <div class="text-muted small">{{ course.units }} units</div>
+            </div>
+          </div>
+        </a>
+        {% empty %}
+        <p class="text-muted">No courses yet.</p>
+        {% endfor %}
+      </div>
+    </div>
+
+    <!-- Recent Threads -->
+    <div class="col-lg-7">
+      <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+        <h5 class="text-white fw-600 mb-0"><i class="bi bi-chat-square-text me-2"></i>Recent Threads</h5>
+        <a href="{% url 'forum:thread_list' %}?department={{ department.pk }}" class="btn btn-outline-glass btn-sm">View All</a>
+      </div>
+      {% for thread in recent_threads %}
+      <a href="{% url 'forum:thread_detail' thread.pk %}" class="thread-card mb-3">
+        <div class="d-flex align-items-center gap-2 mb-2">
+          <span class="badge badge-glass small">{{ thread.course.code }}</span>
+          <span class="badge {% if thread.status == 'resolved' %}badge-resolved{% else %}badge-open{% endif %}">{{ thread.status }}</span>
+          {% if thread.is_pinned %}<span class="badge badge-glow"><i class="bi bi-pin-fill me-1"></i>Pinned</span>{% endif %}
+        </div>
+        <div class="thread-title mb-1">{{ thread.title }}</div>
+        <div class="thread-excerpt mb-2">{{ thread.content|truncatechars:100 }}</div>
+        <div class="d-flex align-items-center gap-3 text-muted small">
+          <div class="avatar-xs">{{ thread.author.username|first|upper }}</div>
+          <span>{{ thread.author.username }}</span>
+          <span class="ms-auto"><i class="bi bi-chat me-1"></i>{{ thread.reply_count }}</span>
+          <span><i class="bi bi-clock me-1"></i>{{ thread.created_at|timesince }} ago</span>
+        </div>
+      </a>
+      {% empty %}
+      <div class="glass-panel p-4 text-center">
+        <i class="bi bi-chat-square-dots text-muted fs-2 d-block mb-2"></i>
+        <p class="text-muted small mb-2">No threads in this department yet.</p>
+        <a href="{% url 'forum:create_thread' %}" class="btn btn-primary-glow btn-sm">Start a Thread</a>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,146 @@
+{% extends 'base.html' %}
+{% block title %}Chat — Uni-Connect{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div class="container">
+        <div class="d-flex align-items-center justify-content-between flex-wrap gap-3">
+
+            <div>
+                <h1 class="display-5 fw-bold text-white mb-3">
+                    <i class="bi bi-chat-dots me-2"></i>
+                    Chat with {{ other_user.get_full_name|default:other_user.username }}
+                </h1>
+
+                <p class="text-muted mb-4">
+                    Private conversation with {{ other_user.username }}.
+                </p>
+            </div>
+
+            <a href="{% url 'forum:chat_list' %}" class="btn btn-outline-glass">
+                Back to Chats
+            </a>
+
+        </div>
+    </div>
+</div>
+
+<div class="container pb-5">
+
+    <div class="glass-panel p-4">
+
+        <div class="chat-messages mb-4">
+
+            {% if messages %}
+
+                {% for message in messages %}
+
+                    <div class="chat-message {% if message.sender == request.user %}chat-message-sent{% else %}chat-message-received{% endif %}">
+
+                        <div class="d-flex align-items-start gap-2 mb-2">
+
+                            <div class="avatar-xs">
+                                {{ message.sender.username|first|upper }}
+                            </div>
+
+                            <div>
+
+                                <div class="text-white fw-semibold small">
+                                    {{ message.sender.get_full_name|default:message.sender.username }}
+                                </div>
+
+                                <div class="text-muted xsmall">
+                                    {{ message.created_at|date:"M j, Y g:i A" }}
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                        <div class="chat-bubble">
+
+                            {% if message.content %}
+                                {{ message.content|linebreaksbr }}
+                            {% endif %}
+
+                            {% if message.attachment %}
+                                <div class="mt-2">
+                                    <a href="{{ message.attachment.url }}"
+                                       target="_blank"
+                                       class="text-accent">
+
+                                        <i class="bi bi-paperclip me-1"></i>
+                                        Download attachment
+
+                                    </a>
+                                </div>
+                            {% endif %}
+
+                        </div>
+
+                    </div>
+
+                {% endfor %}
+
+            {% else %}
+
+                <div class="text-center py-5 text-muted">
+
+                    <i class="bi bi-chat-heart fs-2 d-block mb-3"></i>
+
+                    <p>
+                        This conversation is empty. Send the first message to start the chat.
+                    </p>
+
+                </div>
+
+            {% endif %}
+
+        </div>
+
+        <form method="POST" enctype="multipart/form-data">
+
+            {% csrf_token %}
+
+            <div class="mb-3">
+                {{ form.content }}
+            </div>
+
+            <div class="d-flex flex-wrap gap-2 mb-3">
+
+                <button
+                    type="button"
+                    class="btn btn-outline-glass btn-sm emoji-button"
+                    data-target="id_content">
+
+                    😀 Insert Emoji
+
+                </button>
+
+                <span class="text-muted small">
+                    Use emoji reactions in the chat.
+                </span>
+
+            </div>
+
+            <div class="mb-3">
+
+                <label class="form-label">
+                    Attach File
+                </label>
+
+                {{ form.attachment }}
+
+            </div>
+
+            <button class="btn btn-primary-glow">
+                Send Message
+            </button>
+
+        </form>
+
+    </div>
+
+</div>
+
+{% endblock %}
