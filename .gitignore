@@ -7,3 +7,4 @@ sent_emails/*
 !sent_emails/.gitkeep
 media/uploads/*
 .DS_Store
+node_modules
