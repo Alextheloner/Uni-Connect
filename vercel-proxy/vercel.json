@@ -1,0 +1,19 @@
+{
+  "rewrites": [
+    {
+      "source": "/:path*",
+      "destination": "https://uni-connect-backend.onrender.com/:path*"
+    }
+  ],
+  "headers": [
+    {
+      "source": "/:path*",
+      "headers": [
+        {
+          "key": "x-vercel-enable-rewrite-caching",
+          "value": "0"
+        }
+      ]
+    }
+  ]
+}
