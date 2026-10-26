@@ -18,7 +18,19 @@ SECRET_KEY = os.environ.get(
 
 DEBUG = os.environ.get("DJANGO_DEBUG", "True") == "True"
 
-ALLOWED_HOSTS = ["*"]
+ALLOWED_HOSTS = [
+    "uni-connect-backend.onrender.com",
+    "your-project.vercel.app",
+]
+
+CSRF_TRUSTED_ORIGINS = [
+    "https://uni-connect-backend.onrender.com",
+    "https://your-project.vercel.app",
+]
+
+SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_SECURE = True
 
 INSTALLED_APPS = [
     "django.contrib.admin",
