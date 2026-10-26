@@ -2,8 +2,8 @@ services:
   - type: web
     name: uni-connect
     runtime: python
-    buildCommand: "./build.sh"
-    startCommand: "gunicorn uniconnect.wsgi:application"
+    buildCommand: "bash build.sh"
+    startCommand: "gunicorn uniconnect.wsgi:application --bind 0.0.0.0:$PORT"
     envVars:
       - key: DATABASE_URL
         fromDatabase:
@@ -13,8 +13,6 @@ services:
         generateValue: true
       - key: DEBUG
         value: false
-      - key: PYTHON_VERSION
-        value: 3.11.0
 
 databases:
   - name: uni-connect-db
