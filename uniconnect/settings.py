@@ -13,24 +13,36 @@ load_dotenv(BASE_DIR / ".env")
 
 SECRET_KEY = os.environ.get(
     "DJANGO_SECRET_KEY",
-    "uni-connect-dev-secret-key-change-in-production-2024"
+    os.environ.get("SECRET_KEY", "uni-connect-dev-secret-key-change-in-production-2024")
 )
 
-DEBUG = os.environ.get("DJANGO_DEBUG", "True") == "True"
+DEBUG = os.environ.get(
+    "DJANGO_DEBUG", os.environ.get("DEBUG", "False" if os.environ.get("RENDER") else "True")
+).lower() in {"true", "1", "yes"}
 
 ALLOWED_HOSTS = [
-    "uni-connect-backend.onrender.com",
-    "your-project.vercel.app",
+    "localhost",
+    "127.0.0.1",
+    "uni-connect-y49g.onrender.com",
+    "uni-connect-vercel-proxy.vercel.app",
 ]
 
 CSRF_TRUSTED_ORIGINS = [
-    "https://uni-connect-backend.onrender.com",
-    "https://your-project.vercel.app",
+    "https://uni-connect-y49g.onrender.com",
+    "https://uni-connect-vercel-proxy.vercel.app",
 ]
 
+ALLOWED_HOSTS += [host.strip() for host in os.environ.get("ALLOWED_HOSTS", "").split(",") if host.strip()]
+CSRF_TRUSTED_ORIGINS += [
+    origin.strip() for origin in os.environ.get("CSRF_TRUSTED_ORIGINS", "").split(",") if origin.strip()
+]
+if os.environ.get("RENDER_EXTERNAL_HOSTNAME"):
+    ALLOWED_HOSTS.append(os.environ["RENDER_EXTERNAL_HOSTNAME"])
+    CSRF_TRUSTED_ORIGINS.append("https://" + os.environ["RENDER_EXTERNAL_HOSTNAME"])
+
 SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
-SESSION_COOKIE_SECURE = True
-CSRF_COOKIE_SECURE = True
+SESSION_COOKIE_SECURE = not DEBUG
+CSRF_COOKIE_SECURE = not DEBUG
 
 INSTALLED_APPS = [
     "django.contrib.admin",
@@ -118,7 +130,7 @@ STATICFILES_DIRS = [BASE_DIR / "static"]
 
 STATIC_ROOT = BASE_DIR / "staticfiles"
 
-STATICFILES_STORAGE = STORAGES = {
+STORAGES = {
     "default": {
         "BACKEND": "django.core.files.storage.FileSystemStorage",
     },
@@ -168,10 +180,3 @@ DEFAULT_FROM_EMAIL = os.environ.get(
     "DEFAULT_FROM_EMAIL",
     "Uni-Connect <no-reply@uniconnect.local>",
 )
-
-CSRF_TRUSTED_ORIGINS = [
-    "https://*.replit.dev",
-    "https://*.repl.co",
-    "https://*.replit.app",
-    "https://*.onrender.com",
-]
